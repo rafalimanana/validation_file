@@ -1,13 +1,21 @@
 <?php 
 
-namespace FileValidator;
-
+namespace Pw\FileValidator;
 
 class FileValidator
 {
-    protected $allowedMimeTypes;
-    protected $allowedExtensions;
-    protected $maxFileSize;
+    /**
+     * Mime types allowed
+     */
+    private $allowedMimeTypes = null;
+    /**
+     * Extensions allowed
+     */
+    private $allowedExtensions = null;
+    /**
+     * Max size for file
+     */
+    private $maxFileSize = null;
 
     public function __construct(
         $allowedMimeTypes = null,
@@ -20,6 +28,12 @@ class FileValidator
         $this->maxFileSize = $maxFileSize;
     }
 
+    /**
+     * @param $file
+     * @param $dir
+     * @param $file_name
+     * @return boolean
+     */
     public function uploadToPath($file, $dir, $file_name)
     {
         if(!$file || !$dir || !$file_name){
@@ -37,7 +51,10 @@ class FileValidator
 
         return true;
     }
-
+    /**
+     * @param $file
+     * @return boolean
+     */
     public function isImage($file){
         if(!$file){
             return false;
@@ -71,7 +88,10 @@ class FileValidator
 
         return false;
     }
-
+    /**
+     * @param $file
+     * @return boolean
+     */
     public function isPdf($file){
         if(!$file){
             return false;
@@ -96,7 +116,10 @@ class FileValidator
         }
         return false;
     }
-
+    /**
+     * @param $file
+     * @return boolean
+     */
     public function isDocx($file){
         if(!$file){
             return false;
@@ -124,7 +147,10 @@ class FileValidator
         }
         return false;
     }
-
+    /**
+     * @param $file
+     * @return boolean
+     */
     public function isExcel($file){
         if(!$file){
             return false;
@@ -152,6 +178,10 @@ class FileValidator
         }
         return false;
     }
+    /**
+     * @param $file
+     * @return boolean
+     */
     public function isVideo($file){
         if(!$file){
             return false;
@@ -180,7 +210,10 @@ class FileValidator
         }
         return false;
     }
-
+    /**
+     * @param $file
+     * @return string|null
+     */
     public function getFileType($file)
     {
         if (!$file) {
@@ -247,6 +280,11 @@ class FileValidator
         return null;
     }
 
+    /**
+     * @param $file
+     * @param $max_mb
+     * @return boolean
+     */
     public function validSize($file, $max_mb=1){
         if(!$file){
             return false;
@@ -268,6 +306,10 @@ class FileValidator
         return false;
     }
 
+    /**
+     * @param $file
+     * @return boolean
+     */
     public function validateMimeType($file): bool
     {
         if(!$file){
@@ -297,6 +339,10 @@ class FileValidator
         return false;
     }
 
+    /**
+     * @param $file
+     * @return boolean
+     */
     public function validateExtension($file): bool
     {
         if(!$file){
@@ -329,6 +375,39 @@ class FileValidator
         return false;
     }
 
+    /**
+     * @param $file
+     * @return boolean
+     */
+    public function validateSize($file): bool
+    {
+        if(!$file){
+            return false;
+        }
+        $fileSize = null;
+        if (
+            is_object($file) && 
+            method_exists($file, 'getSize')
+        ) {
+            $fileSize = $file->getSize();
+        }
+        else if (is_string($file) || is_integer($file)) {
+            $fileSize = $file;
+        }
+        if (!$fileSize) {
+            return false;
+        }
+        if ($this->maxFileSize) {
+            return $fileSize <= $this->maxFileSize;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $file
+     * @return boolean
+     */
     public function validateFile($file): bool
     {
         if (!$file) {

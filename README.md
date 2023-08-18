@@ -18,7 +18,7 @@ php composer.phar require rafalimanana/file-validator
 ### FileValidator
 #### Importation de la classe
 ```php
-use FileValidator\FileValidator
+use Pw\FileValidator\FileValidator
 ```
 
 #### Instanciation
@@ -27,8 +27,9 @@ $fileValidator = new FileValidator([]);
 ```
 
 #### Exemple d’utilisation
+###### Utilisation avec les définitions des extensions, des types et de la taille des fichiers autorisés
 ```php
-use FileValidator\FileValidator
+use Pw\FileValidator\FileValidator
 
 $allowedMimeTypes = ['image/jpeg', 'image/png'];
 $allowedExtensions = ['jpg', 'jpeg', 'png'];
@@ -47,8 +48,44 @@ $file = [
 ];
 
 if ($fileValidator->validateFile($file)) {
-    echo "Le fichier est valide.";
+    //Le fichier est valide.
 } else {
-    echo "Le fichier n'est pas valide.";
+    //Le fichier n'est pas valide.
 }
+```
+###### Utilisation de verifier le type de fichier comme `image` en appelant juste la méthode `isImage`.
+```php
+use Pw\FileValidator\FileValidator
+
+$fileValidator = new FileValidator();
+
+$mimetype = $file->getMimeType();//Type de fichier
+
+if ($fileValidator->isImage($mimetype)) {
+    //Le fichier est un image.
+} else {
+    //Le fichier n'est un image.
+}
+
+//ou
+if ($fileValidator->isImage($file)) {//Objet de fichier
+    //Le fichier est un image.
+} else {
+    //Le fichier n'est un image.
+}
+```
+
+###### Quelques méthodes sur la validation de fichier.
+```php
+uploadToPath($file, $dir, $file_name)
+isImage($file)
+isPdf($file)
+isDocx($file)
+isExcel($file)
+isVideo($file)
+getFileType($file)
+validSize($file, $max_mb=1)
+validateMimeType($file)
+validateExtension($file)
+validateFile($file)
 ```
