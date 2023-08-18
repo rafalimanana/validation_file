@@ -20,6 +20,24 @@ class FileValidator
         $this->maxFileSize = $maxFileSize;
     }
 
+    public function uploadToPath($file, $dir, $file_name)
+    {
+        if(!$file || !$dir || !$file_name){
+            return false;
+        }
+        if (!is_object($file)) {
+            return false;
+        }
+        try {
+            $file->move($dir, $file_name);
+        }
+        catch(\Exception $e){
+            return false;
+        }
+
+        return true;
+    }
+
     public function isImage($file){
         if(!$file){
             return false;
@@ -360,6 +378,6 @@ class FileValidator
             $this->validateMimeType($type) &&
             $this->validateExtension($name) &&
             $this->validateSize($size)
-        )
+        );
     }
 }
