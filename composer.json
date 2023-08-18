@@ -1,0 +1,21 @@
+{
+    "name": "rafalimanana/file-validator",
+    "description": "Validation de fichier",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "rafalimanana",
+            "email": "rafalimananafabrice@gmail.com"
+        }
+    ],
+    "version": "0.0.1",
+    "require": {
+        "php": ">=8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "FileValidator\\": "src/"
+        }
+    }
+}
