@@ -1,6 +1,6 @@
 <?php 
 
-namespace Pw\FileValidator;
+namespace FileValidator;
 
 class FileValidator
 {
