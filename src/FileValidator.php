@@ -459,4 +459,111 @@ class FileValidator
             $this->validateSize($size)
         );
     }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    public function analyseFileByVirustotal(
+        $data = []
+    )
+    {
+        $file = null;
+        $virustotalApiKey = null;
+        if (isset($data["file"])) {
+            $file = $data["file"];
+        }
+        if (isset($data["virustotalApiKey"])) {
+            $virustotalApiKey = $data["virustotalApiKey"];
+        }
+        if(!$file || !is_object($file)) {
+            return [
+                "status"=>500,
+                "code"=>"error_file",
+            ];
+        }
+        if(!$virustotalApiKey)) {
+            return [
+                "status"=>500,
+                "code"=>"error_key",
+            ];
+        }
+        $virustotalUrl = 'https://www.virustotal.com/api/v3/files';
+        
+        // Préparer les données multipart pour cURL
+        $postData = [
+            'file' => curl_file_create(
+                $file->getRealPath(), 
+                $file->getMimeType(), 
+                $file->getClientOriginalName()
+            )
+        ];
+
+        try {
+            // Créer une ressource cURL
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL, $virustotalUrl);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, ['x-apikey: ' . $virustotalApiKey]);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $postData);
+            
+            // Exécuter la requête cURL
+            $response = curl_exec($curl);
+            
+            // Gérer les erreurs cURL
+            if (curl_errno($curl)) {
+                $errorMessage = 'Erreur cURL : ' . curl_error($curl);
+                return [
+                    "status"=>500,
+                    "code"=>"error_curl",
+                    "message"=>$errorMessage,
+                ];
+            }
+            
+            curl_close($curl);
+            
+            $result = json_decode($response, true);
+
+            // Vérification si le fichier est sûr selon la réponse de VirusTotal
+            $data = [];
+            $attributes = [];
+            $last_analysis_stats = [];
+            $malicious = null;
+            if (isset($result['data'])) {
+                $data = $result['data'];
+            }
+            if (isset($data["attributes"])) {
+                $attributes = $data["attributes"];
+            }
+            if (isset($attributes["last_analysis_stats"])) {
+                $last_analysis_stats = $attributes["last_analysis_stats"];
+            }
+            if (isset($last_analysis_stats["malicious"])) {
+                $malicious = $last_analysis_stats["malicious"];
+            }
+            // Vérification si le fichier est sûr selon la réponse de VirusTotal
+            if ($malicious === 0) {
+                return [
+                    "status"=>200
+                ];
+            }
+            else {
+                return [
+                    "status"=>500,
+                    "code"=>"error_danger",
+                ];
+            }
+        }
+        catch(\Exception $e){
+            return [
+                "status"=>500,
+                "code"=>"error_analyse",
+            ];
+        }
+        return [
+            "status"=>500,
+            "code"=>"error_analyse",
+        ];
+    }
 }
